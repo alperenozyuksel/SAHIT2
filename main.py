@@ -48,11 +48,8 @@ class MainWindow(QMainWindow):
         self.mavlink_thread.vfr_hud_updated.connect(self.updated_vfr)
         self.mavlink_thread.throttle_updated.connect(self.update_throttle)
         self.mavlink_thread.msg_mode_updated.connect(self.mete_updated)
+        self.mavlink_thread.attitude_updated.connect(self.updated_attitude)
         self.mavlink_thread.start()
-
-
-
-
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_all)  # Her zamanlayıcıda yeniden çiz
@@ -370,9 +367,6 @@ class MainWindow(QMainWindow):
         self.label_yukseklik_etiketi.move(640,772)
 
 
-
-
-
         self.yellow_arrow = yellow_arrow.YellowArrow(tab)
         self.yellow_arrow.setGeometry(100, 100, 100, 80)  # Adjust position and size as needed
         self.yellow_arrow.set_angle(270)
@@ -453,7 +447,6 @@ class MainWindow(QMainWindow):
         self.status_text_box.setGeometry(1340, 845, 300, 150)  # (x, y, width, height)
 
 
-
         self.voltaj_frame = QFrame(tab)
         self.voltaj_frame.setFrameShape(QFrame.Box)
         self.voltaj_frame.setStyleSheet("background-color: #000000; border: 2px solid white;")
@@ -520,6 +513,55 @@ class MainWindow(QMainWindow):
         self.amper_needle.setNeedleSize(75, 5)
         self.amper_needle.move(1070, 400)
 
+        self.sayisalverilertext_label = ["CUSTOM MOD:", "VOLTAj:", "AMPER:", "HEADİNG:", "ARM DURUMU:",
+                                         "YERDEN YÜKSEKLİK:", "DENİZ YÜKSEKLİĞİ:", "BATARYA:"]
+
+        for i in range(8):
+            label = QLabel(self.sayisalverilertext_label[i], tab)
+            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
+            label.setAlignment(Qt.AlignCenter)
+            label.move(1550, 300 + i * 30)
+
+        self.sayisalveriler_label = ["1", "2", "3", "4", "5", "6", "7", "8"]
+        self.sayisalveriler_labels = []
+        for i in range(8):
+            label = QLabel(self.sayisalveriler_label[i], tab)
+            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
+            label.setAlignment(Qt.AlignCenter)
+            label.move(1690, 300 + i * 30)
+            self.sayisalveriler_labels.append(label)
+
+        self.sayisalverilertext2_label = ["BASE MOD:", "GPS SPEED:", "AİR SPEED:", "DEVİR:", "GAZ:", "DİKİLME:",
+                                          "YATIŞ:", "YUVARLANMA:"]
+
+        for i in range(8):
+            label = QLabel(self.sayisalverilertext2_label[i], tab)
+            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
+            label.setAlignment(Qt.AlignCenter)
+            label.move(1400, 300 + i * 30)
+
+        self.sayisalveriler2_label = ["1", "2", "3", "4", "5", "6", "7", "8"]
+        self.sayisalveriler2_labels = []
+        for i in range(8):
+            label = QLabel(self.sayisalveriler2_label[i], tab)
+            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
+            label.setAlignment(Qt.AlignCenter)
+            label.move(1490, 300 + i * 30)
+            self.sayisalveriler2_labels.append(label)
+
+        self.imu_labels = ["GPS", "INS", "MAG", "AHRS", "EKF", "PRE", "SICAKLIK"]
+        self.imu_frames = []
+        for i in range(7):
+            box = QFrame(tab)
+            box.setFrameShape(QFrame.Box)
+            box.setStyleSheet("background-color: #000000; border: 1px solid white;")
+            box.setFixedSize(100, 25)
+            box.move(1200, 790 + i * 30)
+
+            label = QLabel(self.imu_labels[i], box)
+            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
+            label.setAlignment(Qt.AlignCenter)
+            self.imu_frames.append(box)
 
         return tab
 
@@ -546,12 +588,14 @@ class MainWindow(QMainWindow):
         self.label_yukseklik_etiketi.move(640, int(yeni_y-8))
         self.yukselik_etiketi.move(638, int(yeni_y-10))
         self.yellow_arrow.move(572, int(yeni_y - 40))
+        self.sayisalveriler_labels[5].setText(f"{relative_alt}")
 
     def update_throttle(self, chan3_raw):
         throttle = int(chan3_raw)
         yeni_y = 630 - (throttle * 3.58)
         yeni_y = max(50, min(yeni_y, 630))
         self.yellow_arrow_throttle.move(1302, int(yeni_y)+12)
+        self.sayisalveriler2_labels[4].setText(f"{throttle}")
 
     def update_arm(self, base_mode):
 
@@ -565,7 +609,7 @@ class MainWindow(QMainWindow):
             self.motor_frames[1].setStyleSheet("background-color: #FF0000; border: 2px solid white;")
             self.motor_frames_2[0].setStyleSheet("background-color: #FF0000; border: 2px solid white;")
             self.motor_frames_2[1].setStyleSheet("background-color: #FF0000; border: 2px solid white;")
-
+        self.sayisalveriler2_labels[0].setText(f"{base_mode}")
     def updated_ins(self, ins_healthy):
 
         if ins_healthy == True:
@@ -630,6 +674,9 @@ class MainWindow(QMainWindow):
         self.label_batarya.setText(f"%{remaining}")
         self.label_voltaj.setText(f"{voltage}")
         self.label_amper.setText(f"{current}")
+        self.sayisalveriler_labels[1].setText(f"{voltage}")
+        self.sayisalveriler_labels[2].setText(f"{current}")
+        self.sayisalveriler_labels[7].setText(f"{remaining}")
 
         self.voltaj_needle.setAirspeed(voltage)
         self.amper_needle.setAirspeed(current)
@@ -656,9 +703,13 @@ class MainWindow(QMainWindow):
         self.label_heading.setText(f"{heading}")
         self.label_airspeed.setText(f"{airspeed}")
         self.label_gpsspeed.setText(f"{groundspeed}")
+        self.sayisalveriler_labels[3].setText(f"{heading}")
+        self.sayisalveriler2_labels[2].setText(f"{airspeed}")
+        self.sayisalveriler2_labels[1].setText(f"{groundspeed}")
         self.label_yukseklik_etiketi_sea.setText(f"{altitude}")
         self.airspeed_needle.setAirspeed(airspeed)
         self.gpsspeed_needle.setAirspeed(groundspeed)
+        self.sayisalveriler_labels[6].setText(f"{altitude}")
 
         global_yukseklik = int(altitude)
         self.label_yukseklik_etiketi_sea.setText(f"{global_yukseklik}")
@@ -713,8 +764,14 @@ class MainWindow(QMainWindow):
                 mode_text = f"UNKNOWN ({mode_text})"
 
             self.label_mode.setText(f"{mode_text}")
+            self.sayisalveriler_labels[0].setText(f"{mode_text}")
         except Exception as e:
             print(f"Error in heartbeat_guncelleme: {e}")
+
+    def updated_attitude(self, roll, pitch, yaw):
+        self.sayisalveriler_labels[5].setText(f"{pitch}")
+        self.sayisalveriler_labels[6].setText(f"{roll}")
+        self.sayisalveriler_labels[7].setText(f"{yaw}")
 
     def update_all(self):
         self.update()
