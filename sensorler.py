@@ -1,3 +1,5 @@
+import math
+
 from PyQt5.QtCore import QThread, pyqtSignal
 from pymavlink import mavutil
 from baglanma import mavlink_connection
@@ -110,6 +112,7 @@ class MAVLinkDataThread(QThread):
             roll = msg.roll * (180.0 / 3.141592)
 
             self.attitude_updated.emit(pitch, yaw, roll)
+
 
 
 

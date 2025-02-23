@@ -82,6 +82,7 @@ class MainWindow(QMainWindow):
         scaled_pixmap_2 = pixmap_2.scaled(300, 800, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.logo.setPixmap(scaled_pixmap_2)
         self.logo.setAlignment(Qt.AlignCenter)
+        self.logo.setStyleSheet("background-color: transparent;")
         self.logo.move(500,800)
 
 
@@ -100,6 +101,7 @@ class MainWindow(QMainWindow):
         scaled_pixmap_1 = pixmap_1.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.ibre_devir.setPixmap(scaled_pixmap_1)
         self.ibre_devir.setAlignment(Qt.AlignCenter)
+        self.ibre_devir.setStyleSheet("background: transparent;")
         self.ibre_devir.move(80, 20)
 
         self.ibre_heading = QLabel(tab)
@@ -107,6 +109,7 @@ class MainWindow(QMainWindow):
         self.scaled_pixmap_3 = pixmap_3.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.ibre_heading.setPixmap(self.scaled_pixmap_3)
         self.ibre_heading.setAlignment(Qt.AlignCenter)
+        self.ibre_heading.setStyleSheet("background: transparent;")
         self.ibre_heading.move(379, 10)
 
 
@@ -115,6 +118,7 @@ class MainWindow(QMainWindow):
         scaled_pixmap_4 = pixmap_4.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.ibre_air_speed.setPixmap(scaled_pixmap_4)
         self.ibre_air_speed.setAlignment(Qt.AlignCenter)
+        self.ibre_air_speed.setStyleSheet("background: transparent;")
         self.ibre_air_speed.move(700, 20)
 
 
@@ -123,6 +127,7 @@ class MainWindow(QMainWindow):
         scaled_pixmap_6 = pixmap_6.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.ibre_gps_speed.setPixmap(scaled_pixmap_6)
         self.ibre_gps_speed.setAlignment(Qt.AlignCenter)
+        self.ibre_gps_speed.setStyleSheet("background: transparent;")
         self.ibre_gps_speed.move(1055, 20)
 
         self.ibre_dikilme = QLabel(tab)
@@ -130,6 +135,7 @@ class MainWindow(QMainWindow):
         scaled_pixmap_5 = pixmap_5.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.ibre_dikilme.setPixmap(scaled_pixmap_5)
         self.ibre_dikilme.setAlignment(Qt.AlignCenter)
+        self.ibre_dikilme.setStyleSheet("background: transparent;")
         self.ibre_dikilme.move(1365, 20)
 
         self.ibre_yatis = QLabel(tab)
@@ -137,6 +143,7 @@ class MainWindow(QMainWindow):
         scaled_pixmap_9 = pixmap_9.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.ibre_yatis.setPixmap(scaled_pixmap_9)
         self.ibre_yatis.setAlignment(Qt.AlignCenter)
+        self.ibre_yatis.setStyleSheet("background: transparent;")
         self.ibre_yatis.move(1645, 20)
 
 
@@ -769,9 +776,38 @@ class MainWindow(QMainWindow):
             print(f"Error in heartbeat_guncelleme: {e}")
 
     def updated_attitude(self, roll, pitch, yaw):
-        self.sayisalveriler_labels[5].setText(f"{pitch}")
-        self.sayisalveriler_labels[6].setText(f"{roll}")
-        self.sayisalveriler_labels[7].setText(f"{yaw}")
+        self.sayisalveriler2_labels[5].setText(f"{int(pitch)}")
+        self.sayisalveriler2_labels[6].setText(f"{int(roll)}")
+        self.sayisalveriler2_labels[7].setText(f"{int(yaw)}")
+
+        original_pixmap = QPixmap("images/yan.png")
+        scaled_pixmap = original_pixmap.scaled(125, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+        # Transform ile döndürme işlemi
+        transform = QTransform()
+        transform.rotate(roll)  # Negatif yön, çünkü burun yukarı açıldığında resim aşağı kaymalı
+
+
+
+
+        # Yeni döndürülmüş pixmap oluştur (Ölçek korunuyor)
+        rotated_pixmap = scaled_pixmap.transformed(transform, Qt.SmoothTransformation)
+
+        # QLabel'e yeni pixmap'i ata
+        self.yan_goruntu.setPixmap(rotated_pixmap)
+
+        original_pixmap_2 = QPixmap("images/on.png")
+        scaled_pixmap_2 = original_pixmap_2.scaled(125, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+        # Transform ile döndürme işlemi
+        transform_2 = QTransform()
+        transform_2.rotate(yaw)
+
+        # Yeni döndürülmüş pixmap oluştur (Ölçek korunuyor)
+        rotated_pixmap_2 = scaled_pixmap_2.transformed(transform_2, Qt.SmoothTransformation)
+
+        # QLabel'e yeni pixmap'i ata
+        self.on_goruntu.setPixmap(rotated_pixmap_2)
 
     def update_all(self):
         self.update()
