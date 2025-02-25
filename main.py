@@ -9,6 +9,12 @@ from sensorler import *
 from ibredoksanderece import NeedleDoksanDerece
 from ibreyuzdensifira import NeedleYuzdenSifira
 from ibresifirdanyuze import NeedleSifirdanYuze
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
+from PyQt5.QtWebEngineWidgets import QWebEngineSettings
+from ImageLabelClass import ImageLabel
+from frameclass import FrameClass
+from labelclass import LabelClass
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -26,7 +32,7 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
 
-        self.tabs.addTab(self.create_tab("Sekme 1"), "Sekme 1")
+        self.tabs.addTab(self.create_map_tab("Harita"), "Harita")
         self.tabs.addTab(self.create_sekme_2(), "Sekme 2")
         self.tabs.addTab(self.create_tab("Sekme 3"), "Sekme 3")
 
@@ -54,7 +60,6 @@ class MainWindow(QMainWindow):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_all)  # Her zamanlayıcıda yeniden çiz
         self.timer.start(100)  # Her 100ms'de bir
-
     def create_tab(self, title):
         tab = QWidget()
         tab_layout = QVBoxLayout()
@@ -65,186 +70,133 @@ class MainWindow(QMainWindow):
         tab.setStyleSheet("background-color: #000000;")
         return tab
 
+    def create_map_tab(self, title):
+        tab = QWidget()
+        tab_layout = QVBoxLayout()
+
+        # Harita için Frame oluştur
+        map_frame = QFrame()
+        map_frame.setStyleSheet("background-color: #2E2E2E; border: 1px solid #444;")  # Frame stilini ayarla
+        map_frame_layout = QVBoxLayout(map_frame)
+        map_frame_layout.setContentsMargins(0, 0, 0, 0)  # Kenar boşluklarını kaldır
+
+        # QWebEngineView (Harita Görüntüleme)
+        self.map_view = QWebEngineView()
+        self.map_view.settings().setAttribute(QWebEngineSettings.JavascriptEnabled, True)
+        self.map_view.settings().setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+        self.map_view.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
+
+        # JavaScript hatalarını konsolda görmek için
+        self.map_view.page().javaScriptConsoleMessage = (
+            lambda level, message, line, sourceID: print(f"JS Error [{level}]: {message} (Line {line})")
+        )
+
+        # HTML İçeriği (Aynı)
+        html_content = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Harita</title>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+                <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+                <style>
+                    html, body { height: 100%; margin: 0; padding: 0; }
+                    #map { height: calc(100% - 50px); width: 100vw; }
+                </style>
+            </head>
+            <body>
+                <div id="map"></div>
+                <script>
+                    var map = L.map('map').setView([51.505, -0.09], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(map);
+                </script>
+            </body>
+            </html>
+        """
+
+        self.map_view.setHtml(html_content)
+
+        # Harita görünümünü frame içine ekle
+        map_frame_layout.addWidget(self.map_view)
+
+        # Frame'i ana layout'a ekle
+        tab_layout.addWidget(map_frame)
+
+        # Tab'ı yerleşimle düzenle
+        tab.setLayout(tab_layout)
+        tab.setStyleSheet("background-color: #000000;")  # Arka plan rengi
+
+        return tab
+
     def create_sekme_2(self):
         tab = QWidget()
 
-
-
-        self.image_label = QLabel(tab)
-        pixmap = QPixmap("images/droneimg.png")
-        scaled_pixmap = pixmap.scaled(1000, 800, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.image_label.setPixmap(scaled_pixmap)
-        self.image_label.setAlignment(Qt.AlignCenter)
-        self.image_label.move(480, 200)
-
-        self.logo = QLabel(tab)
-        pixmap_2 = QPixmap("images/SONYAKAMOZ1.png")
-        scaled_pixmap_2 = pixmap_2.scaled(300, 800, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.logo.setPixmap(scaled_pixmap_2)
-        self.logo.setAlignment(Qt.AlignCenter)
-        self.logo.setStyleSheet("background-color: transparent;")
-        self.logo.move(500,800)
-
-
         self.resim_yolu = "batarya/1.png"
-        self.ibre_batarya_100 = QLabel(tab)
-        self.pixmap_7 = QPixmap(self.resim_yolu)
-        scaled_pixmap_7 = self.pixmap_7.scaled(180, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.drone_label = ImageLabel(parent=tab, width=1000, height=600, x_pos=680, y_pos=180, image_path="images/drone600_600.png")
+        self.logo = ImageLabel(parent=tab, width=300, height=800,x_pos=500, y_pos=800, image_path="images/SONYAKAMOZ1.png")
+        self.ibre_batarya_100 = ImageLabel(parent=tab,height=180,width=200,x_pos=885,y_pos=340,image_path=self.resim_yolu)
+        self.ibre_devir = ImageLabel(parent=tab, height=200,width=300,x_pos=80,y_pos=20,image_path="images/ibre2.png")
+        self.ibre_heading = ImageLabel(parent=tab, height=200,width=300,x_pos=379,y_pos=20,image_path="images/ibre5.png")
+        self.ibre_air_speed = ImageLabel(parent=tab, height=200,width=300,x_pos=700,y_pos=20,image_path="images/ibre7.png")
+        self.ibre_gps_speed = ImageLabel(parent=tab, height=200,width=300,x_pos=1055,y_pos=20,image_path="images/ibre7.png")
+        self.ibre_dikilme = ImageLabel(parent=tab, height=200,width=300,x_pos=1365,y_pos=20,image_path="images/ibre3.png")
+        self.ibre_yatis = ImageLabel(parent=tab, height=200,width=300,x_pos=1645,y_pos=20,image_path="images/ibre4.png")
+        self.ibre_voltaj = ImageLabel(parent=tab, height=175,width=300,x_pos=680,y_pos=400,image_path="images/deneme.png")
+        self.ibre_amper = ImageLabel(parent=tab, height=175,width=300,x_pos=1082,y_pos=400,image_path="images/ibre10.png")
+        self.yan_goruntu = ImageLabel(parent=tab, height=40,width=300,x_pos=1400,y_pos=96,image_path="images/yan.png")
+        self.ust_goruntu = ImageLabel(parent=tab, height=58,width=300,x_pos=430,y_pos=85,image_path="images/ust.png")
+        self.on_goruntu = ImageLabel(parent=tab, height=70,width=130,x_pos=1680,y_pos=109,image_path="images/on.png")
 
-        self.ibre_batarya_100.setPixmap(scaled_pixmap_7)
-        self.ibre_batarya_100.setAlignment(Qt.AlignCenter)
-        self.ibre_batarya_100.setStyleSheet("background: transparent;")
-        self.ibre_batarya_100.move(885, 340)
+        self.sicaklik_frame = FrameClass(parent=tab, width=100, height=25,x_pos=1815,y_pos=950)
+        self.dis_sicaklik_frame = FrameClass(parent=tab, width=100, height=25,x_pos=1815,y_pos=970)
+        self.sistem_zamani = FrameClass(parent=tab, width=125, height=25,x_pos=1810,y_pos=10)
+        self.batarya_kalan = FrameClass(parent=tab, width=50, height=25,x_pos=952,y_pos=465)
+        self.yukselik_etiketi_sea = FrameClass(parent=tab, width=50, height=20,x_pos=438,y_pos=812)
+        self.yukselik_etiketi = FrameClass(parent=tab, width=40, height=20,x_pos=640,y_pos=772)
+        self.heading_frame = FrameClass(parent=tab, width=50, height=20,x_pos=550,y_pos=20)
+        self.airspeed_frame = FrameClass(parent=tab, width=50, height=20,x_pos=854,y_pos=20)
+        self.amper_frame = FrameClass(parent=tab, width=50, height=20,x_pos=1142,y_pos=550)
+        self.gpsspeed_frame = FrameClass(parent=tab, width=50, height=20,x_pos=1210,y_pos=20)
+        self.voltaj_frame = FrameClass(parent=tab, width=50, height=20,x_pos=741,y_pos=550)
 
-        self.ibre_devir = QLabel(tab)
-        pixmap_1 = QPixmap("images/ibre2.png")
-        scaled_pixmap_1 = pixmap_1.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.ibre_devir.setPixmap(scaled_pixmap_1)
-        self.ibre_devir.setAlignment(Qt.AlignCenter)
-        self.ibre_devir.setStyleSheet("background: transparent;")
-        self.ibre_devir.move(80, 20)
-
-        self.ibre_heading = QLabel(tab)
-        pixmap_3 = QPixmap("images/ibre5.png")
-        self.scaled_pixmap_3 = pixmap_3.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.ibre_heading.setPixmap(self.scaled_pixmap_3)
-        self.ibre_heading.setAlignment(Qt.AlignCenter)
-        self.ibre_heading.setStyleSheet("background: transparent;")
-        self.ibre_heading.move(379, 10)
-
-
-        self.ibre_air_speed = QLabel(tab)
-        pixmap_4 = QPixmap("images/ibre7.png")
-        scaled_pixmap_4 = pixmap_4.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.ibre_air_speed.setPixmap(scaled_pixmap_4)
-        self.ibre_air_speed.setAlignment(Qt.AlignCenter)
-        self.ibre_air_speed.setStyleSheet("background: transparent;")
-        self.ibre_air_speed.move(700, 20)
-
-
-        self.ibre_gps_speed = QLabel(tab)
-        pixmap_6 = QPixmap("images/ibre7.png")
-        scaled_pixmap_6 = pixmap_6.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.ibre_gps_speed.setPixmap(scaled_pixmap_6)
-        self.ibre_gps_speed.setAlignment(Qt.AlignCenter)
-        self.ibre_gps_speed.setStyleSheet("background: transparent;")
-        self.ibre_gps_speed.move(1055, 20)
-
-        self.ibre_dikilme = QLabel(tab)
-        pixmap_5 = QPixmap("images/ibre3.png")
-        scaled_pixmap_5 = pixmap_5.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.ibre_dikilme.setPixmap(scaled_pixmap_5)
-        self.ibre_dikilme.setAlignment(Qt.AlignCenter)
-        self.ibre_dikilme.setStyleSheet("background: transparent;")
-        self.ibre_dikilme.move(1365, 20)
-
-        self.ibre_yatis = QLabel(tab)
-        pixmap_9 = QPixmap("images/ibre4.png")
-        scaled_pixmap_9 = pixmap_9.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.ibre_yatis.setPixmap(scaled_pixmap_9)
-        self.ibre_yatis.setAlignment(Qt.AlignCenter)
-        self.ibre_yatis.setStyleSheet("background: transparent;")
-        self.ibre_yatis.move(1645, 20)
-
-
-        self.ibre_voltaj = QLabel(tab)
-        pixmap_5 = QPixmap("images/deneme.png")
-        scaled_pixmap_5 = pixmap_5.scaled(175, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.ibre_voltaj.setPixmap(scaled_pixmap_5)
-        self.ibre_voltaj.setAlignment(Qt.AlignCenter)
-        self.ibre_voltaj.setStyleSheet("background: transparent;")
-        self.ibre_voltaj.move(680, 400)
-
-        self.ibre_amper = QLabel(tab)
-        pixmap_8 = QPixmap("images/ibre10.png")
-        scaled_pixmap_8 = pixmap_8.scaled(175, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.ibre_amper.setPixmap(scaled_pixmap_8)
-        self.ibre_amper.setAlignment(Qt.AlignCenter)
-        self.ibre_amper.setStyleSheet("background: transparent;")
-        self.ibre_amper.move(1082, 400)
-
-        self.yan_goruntu = QLabel(tab)
-        pixmap_12 = QPixmap("images/yan.png")
-        scaled_pixmap_12 = pixmap_12.scaled(125, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.yan_goruntu.setPixmap(scaled_pixmap_12)
-        self.yan_goruntu.setAlignment(Qt.AlignCenter)
-        self.yan_goruntu.setStyleSheet("background: transparent;")
-        self.yan_goruntu.move(1400, 96)
-
-        self.ust_goruntu = QLabel(tab)
-        pixmap_13 = QPixmap("images/ust.png")
-        scaled_pixmap_13 = pixmap_13.scaled(100, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.ust_goruntu.setPixmap(scaled_pixmap_13)
-        self.ust_goruntu.setAlignment(Qt.AlignCenter)
-        self.ust_goruntu.setStyleSheet("background: transparent;")
-        self.ust_goruntu.move(441, 88)
-
-        self.on_goruntu = QLabel(tab)
-        pixmap_14 = QPixmap("images/on.png")
-        scaled_pixmap_14 = pixmap_14.scaled(125, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.on_goruntu.setPixmap(scaled_pixmap_14)
-        self.on_goruntu.setAlignment(Qt.AlignCenter)
-        self.on_goruntu.setStyleSheet("background: transparent;")
-        self.on_goruntu.move(1682, 110)
+        self.label_sicaklik = LabelClass("SICAKLIK", self.sicaklik_frame, "white" ,"transparent", "bold", "12")
+        label_sicaklik_yazi = LabelClass("FCC Sıcaklık", tab, "white","transparent", "bold", "12")
+        label_sicaklik_yazi.move(1727, 953)
 
         self.imu_labels = ["GPS","INS","MAG","AHRS","EKF","PRE","SICAKLIK"]
         self.imu_frames = []
         for i in range(7):
-            box = QFrame(tab)
-            box.setFrameShape(QFrame.Box)
-            box.setStyleSheet("background-color: #000000; border: 1px solid white;")
-            box.setFixedSize(100, 25)
-            box.move(1200, 790 + i * 30)
 
-            label = QLabel(self.imu_labels[i], box)
-            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-            label.setAlignment(Qt.AlignCenter)
+            box = FrameClass(parent=tab, width=100, height=25,x_pos=1200,y_pos=790+ i * 30)
+            LabelClass(self.imu_labels[i], box, "white", "transparent", "bold", "12")
             self.imu_frames.append(box)
-
-
 
         self.motor_labels = ["MOTOR 1","MOTOR 2"]
         self.motor_frames = []
 
         for i in range(2):
-            box = QFrame(tab)
-            box.setFrameShape(QFrame.Box)
-            box.setStyleSheet("background-color: #000000; border: 2px solid white;")
-            box.setFixedSize(100, 25)
-            box.move(850, 290 + i * 350)
 
-            label = QLabel(self.motor_labels[i], box)
-            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-            label.setAlignment(Qt.AlignCenter)
+            box = FrameClass(parent=tab, width=100, height=25,x_pos=850,y_pos=290+ i * 350)
+            LabelClass(self.motor_labels[i], box, "white", "transparent", "bold", "12")
             self.motor_frames.append(box)
 
         self.motor_labels_2 = ["MOTOR 3","MOTOR 4"]
         self.motor_frames_2 = []
         for i in range(2):
-            box = QFrame(tab)
-            box.setFrameShape(QFrame.Box)
-            box.setStyleSheet("background-color: #000000; border: 2px solid white;")
-            box.setFixedSize(100, 25)
-            box.move(1005, 290 + i * 350)
 
-            label = QLabel(self.motor_labels_2[i], box)
-            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-            label.setAlignment(Qt.AlignCenter)
+            box = FrameClass(parent=tab, width=100, height=25,x_pos=1005,y_pos=290+ i * 350)
+            LabelClass(self.motor_labels_2[i], box, "white", "transparent", "bold", "12")
             self.motor_frames_2.append(box)
-
-
-
 
         self.motor_bars = []
         for i in range(4):
-            box = QFrame(tab)
-            box.setFrameShape(QFrame.Box)
-            box.setStyleSheet("background-color: #444444; border: 2px solid white;")
-            box.setFixedSize(50, 200)
-            box.move(870 + i * 59, 800)
 
-            label = QLabel(f"Motor {i+1}", tab)
-            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px")
+            box = FrameClass(parent=tab, width=50, height=200,x_pos=873 + i * 59,y_pos=770)
+            label = LabelClass(f"Motor {i+1}", tab, "white", "transparent", "bold", "12")
             label.move(873 + i * 59, 770)
 
             bar = QProgressBar(box)
@@ -259,26 +211,10 @@ class MainWindow(QMainWindow):
 
 
 
-        self.sicaklik_frame = QFrame(tab)
-        self.sicaklik_frame.setFrameShape(QFrame.Box)
-        self.sicaklik_frame.setStyleSheet("background-color: #000000; border: 2px solid green;")
-        self.sicaklik_frame.setFixedSize(100, 25)
-        self.sicaklik_frame.move(1815, 950)
-
-        self.pusula_frame = QFrame(tab)
-        self.pusula_frame.setFrameShape(QFrame.Box)
-        self.pusula_frame.setStyleSheet("background-color: #000000; border: 2px solid green;")
-        self.pusula_frame.setFixedSize(100, 25)
-        self.pusula_frame.move(1815, 970)
 
 
-        self.label_sicaklik = QLabel("SICAKLIK", self.sicaklik_frame)
-        self.label_sicaklik.setStyleSheet("color: white; font-weight: bold; font-size: 16px;")
-        self.label_sicaklik.setAlignment(Qt.AlignCenter)
 
-        label_sicaklik_yazi = QLabel("FCC Sıcaklık", tab)
-        label_sicaklik_yazi.setStyleSheet("color: white; font-weight: bold;")
-        label_sicaklik_yazi.move(1727, 953)
+
 
         label_gaz_yazi = QLabel("GAZ", tab)
         label_gaz_yazi.setStyleSheet("color: white; font-weight: bold;")
@@ -308,11 +244,7 @@ class MainWindow(QMainWindow):
         label_horizon_yazi.setStyleSheet("color: white; font-weight: bold;")
         label_horizon_yazi.move(1727, 220)
 
-        self.dis_sicaklik_frame = QFrame(tab)
-        self.dis_sicaklik_frame.setFrameShape(QFrame.Box)
-        self.dis_sicaklik_frame.setStyleSheet("background-color: #000000; border: 2px solid green;")
-        self.dis_sicaklik_frame.setFixedSize(100, 25)
-        self.dis_sicaklik_frame.move(1815, 970)
+
 
         self.label_dis_sicaklik = QLabel(f"{35:.2f}°C", self.dis_sicaklik_frame)
         self.label_dis_sicaklik.setStyleSheet("color: white; font-weight: bold; font-size: 14px;")
@@ -331,17 +263,7 @@ class MainWindow(QMainWindow):
         self.throttle = altitude_inducator.ScaleWidget(tab)
         self.throttle.setGeometry(1300, 300, 50, 400)
 
-        self.sistem_zamani = QFrame(tab)
-        self.sistem_zamani.setFrameShape(QFrame.Box)
-        self.sistem_zamani.setStyleSheet("background-color: #000000; border: 1px solid white;")
-        self.sistem_zamani.setFixedSize(125, 25)
-        self.sistem_zamani.move(1810, 10)
 
-        self.batarya_kalan = QFrame(tab)
-        self.batarya_kalan.setFrameShape(QFrame.Box)
-        self.batarya_kalan.setStyleSheet("background-color: #000000; border: 0px solid green;")
-        self.batarya_kalan.setFixedSize(50, 25)
-        self.batarya_kalan.move(952, 465)
 
         self.label_batarya = QLabel("BATARYA", self.batarya_kalan)
         self.label_batarya.setStyleSheet("color: white; font-weight: bold; font-size: 14px;")
@@ -362,11 +284,7 @@ class MainWindow(QMainWindow):
             label.setStyleSheet("color: white; font-weight: bold; font-size: 10px")
             label.move(1270, 670 - int((i * 3.5)))
 
-        self.yukselik_etiketi = QFrame(tab)
-        self.yukselik_etiketi.setFrameShape(QFrame.Box)
-        self.yukselik_etiketi.setStyleSheet("background-color: #000000; border: 2px solid white;")
-        self.yukselik_etiketi.setFixedSize(40, 20)
-        self.yukselik_etiketi.move(640, 772)
+
 
         self.label_yukseklik_etiketi = QLabel("YUKSEKLIK", tab)
         self.label_yukseklik_etiketi.setStyleSheet("color: white; font-weight: bold; font-size: 11px;")
@@ -389,11 +307,7 @@ class MainWindow(QMainWindow):
         self.yellow_arrow_throttle.set_angle(270)
         self.yellow_arrow_throttle.move(1302, 630)
 
-        self.yukselik_etiketi_sea = QFrame(tab)
-        self.yukselik_etiketi_sea.setFrameShape(QFrame.Box)
-        self.yukselik_etiketi_sea.setStyleSheet("background-color: #000000; border: 2px solid white;")
-        self.yukselik_etiketi_sea.setFixedSize(50, 20)
-        self.yukselik_etiketi_sea.move(438, 812)
+
 
         self.label_yukseklik_etiketi_sea = QLabel("YUKSEKLIK", self.yukselik_etiketi_sea)
         self.label_yukseklik_etiketi_sea.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
@@ -403,31 +317,18 @@ class MainWindow(QMainWindow):
         self.label_sistem_zamani.setStyleSheet("color: white; font-weight: bold; font-size: 14px;")
         self.label_sistem_zamani.setAlignment(Qt.AlignCenter)
 
-        self.heading_frame = QFrame(tab)
-        self.heading_frame.setFrameShape(QFrame.Box)
-        self.heading_frame.setStyleSheet("background-color: #000000; border: 2px solid white;")
-        self.heading_frame.setFixedSize(50, 20)
-        self.heading_frame.move(550, 20)
 
         self.label_heading = QLabel("HEADING", self.heading_frame)
         self.label_heading.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
         self.label_heading.setAlignment(Qt.AlignCenter)
 
-        self.airspeed_frame = QFrame(tab)
-        self.airspeed_frame.setFrameShape(QFrame.Box)
-        self.airspeed_frame.setStyleSheet("background-color: #000000; border: 2px solid white;")
-        self.airspeed_frame.setFixedSize(50, 20)
-        self.airspeed_frame.move(854, 20)
+
 
         self.label_airspeed = QLabel("AIRSPEED", self.airspeed_frame)
         self.label_airspeed.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
         self.label_airspeed.setAlignment(Qt.AlignCenter)
 
-        self.gpsspeed_frame = QFrame(tab)
-        self.gpsspeed_frame.setFrameShape(QFrame.Box)
-        self.gpsspeed_frame.setStyleSheet("background-color: #000000; border: 2px solid white;")
-        self.gpsspeed_frame.setFixedSize(50, 20)
-        self.gpsspeed_frame.move(1210, 20)
+
 
         self.label_gpsspeed = QLabel("GPSPEED", self.gpsspeed_frame)
         self.label_gpsspeed.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
@@ -454,21 +355,12 @@ class MainWindow(QMainWindow):
         self.status_text_box.setGeometry(1340, 845, 300, 150)  # (x, y, width, height)
 
 
-        self.voltaj_frame = QFrame(tab)
-        self.voltaj_frame.setFrameShape(QFrame.Box)
-        self.voltaj_frame.setStyleSheet("background-color: #000000; border: 2px solid white;")
-        self.voltaj_frame.setFixedSize(50, 20)
-        self.voltaj_frame.move(741, 550)
 
         self.label_voltaj = QLabel("VOLTAJ", self.voltaj_frame)
         self.label_voltaj.setAlignment(Qt.AlignCenter)
         self.label_voltaj.setStyleSheet("color: white; font-size: 12px;")
 
-        self.amper_frame = QFrame(tab)
-        self.amper_frame.setFrameShape(QFrame.Box)
-        self.amper_frame.setStyleSheet("background-color: #000000; border: 1px solid white;")
-        self.amper_frame.setFixedSize(50, 20)
-        self.amper_frame.move(1142, 550)
+
 
         self.label_amper = QLabel("AMPER", tab)
         self.label_amper.setStyleSheet("color: white; font-size: 11px; border: 0px")
@@ -559,16 +451,18 @@ class MainWindow(QMainWindow):
         self.imu_labels = ["GPS", "INS", "MAG", "AHRS", "EKF", "PRE", "SICAKLIK"]
         self.imu_frames = []
         for i in range(7):
-            box = QFrame(tab)
-            box.setFrameShape(QFrame.Box)
-            box.setStyleSheet("background-color: #000000; border: 1px solid white;")
-            box.setFixedSize(100, 25)
-            box.move(1200, 790 + i * 30)
+
+            box = FrameClass(parent=tab, width=100, height=25,x_pos=1200, y_pos=790 + i * 30)
 
             label = QLabel(self.imu_labels[i], box)
             label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
             label.setAlignment(Qt.AlignCenter)
             self.imu_frames.append(box)
+
+
+
+
+
 
         return tab
 
@@ -596,6 +490,7 @@ class MainWindow(QMainWindow):
         self.yukselik_etiketi.move(638, int(yeni_y-10))
         self.yellow_arrow.move(572, int(yeni_y - 40))
         self.sayisalveriler_labels[5].setText(f"{relative_alt}")
+
 
     def update_throttle(self, chan3_raw):
         throttle = int(chan3_raw)
@@ -745,6 +640,9 @@ class MainWindow(QMainWindow):
         label_y = 20 - rotated_pixmap.height() // 2 + 98
         self.ibre_heading.move(label_x, label_y)
 
+
+
+
     def mete_updated(self, modes):
         try:
 
@@ -793,20 +691,22 @@ class MainWindow(QMainWindow):
         # Yeni döndürülmüş pixmap oluştur (Ölçek korunuyor)
         rotated_pixmap = scaled_pixmap.transformed(transform, Qt.SmoothTransformation)
 
-        # QLabel'e yeni pixmap'i ata
+        self.yan_goruntu.setStyleSheet("background-color: transparent;")
         self.yan_goruntu.setPixmap(rotated_pixmap)
 
         original_pixmap_2 = QPixmap("images/on.png")
-        scaled_pixmap_2 = original_pixmap_2.scaled(125, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        scaled_pixmap_2 = original_pixmap_2.scaled(125, 500, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
         # Transform ile döndürme işlemi
         transform_2 = QTransform()
         transform_2.rotate(yaw)
 
+
+
         # Yeni döndürülmüş pixmap oluştur (Ölçek korunuyor)
         rotated_pixmap_2 = scaled_pixmap_2.transformed(transform_2, Qt.SmoothTransformation)
-
-        # QLabel'e yeni pixmap'i ata
+        self.on_goruntu.move(1700, 70)
+        self.on_goruntu.setStyleSheet("background-color: transparent;")
         self.on_goruntu.setPixmap(rotated_pixmap_2)
 
     def update_all(self):
