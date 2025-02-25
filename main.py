@@ -197,6 +197,7 @@ class MainWindow(QMainWindow):
             LabelClass(self.imu_labels[i], box, "white", "transparent", "bold", "12")
             self.imu_frames.append(box)
 
+
         self.motor_labels = ["MOTOR 1","MOTOR 2"]
         self.motor_frames = []
 
@@ -446,10 +447,15 @@ class MainWindow(QMainWindow):
             label.setAlignment(Qt.AlignCenter)
             self.imu_frames.append(box)
 
+        self.box_loop_dizi = []
 
-
-
-
+        for i in range(16):
+            box_loop = QFrame(tab)
+            box_loop.setFrameShape(QFrame.Box)
+            box_loop.setStyleSheet("background-color: #000000; border: 1px solid white;")
+            box_loop.setFixedSize(12, 12)
+            box_loop.move(1385, 305 + i * 29.5)
+            self.box_loop_dizi.append(box_loop)
 
         return tab
 
@@ -478,6 +484,10 @@ class MainWindow(QMainWindow):
         self.yellow_arrow.move(572, int(yeni_y - 40))
         self.sayisalveriler_labels[5].setText(f"{relative_alt}")
 
+        if relative_alt <5:
+            self.box_loop_dizi[13].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
+        elif relative_alt >= 5:
+            self.box_loop_dizi[13].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
 
     def update_throttle(self, chan3_raw):
         throttle = int(chan3_raw)
@@ -570,7 +580,22 @@ class MainWindow(QMainWindow):
         self.voltaj_needle.setAirspeed(voltage)
         self.amper_needle.setAirspeed(current)
 
+        if voltage <= 19.5:
+            self.box_loop_dizi[9].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
+        elif 19.5 < voltage <= 20:
+            self.box_loop_dizi[9].setStyleSheet("background-color: #FFFF00; border: 1px solid white;")
+        elif voltage > 20:
+            self.box_loop_dizi[9].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
 
+        if current < 45:
+            self.box_loop_dizi[10].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
+        elif current >= 45:
+            self.box_loop_dizi[10].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
+
+        if remaining < 30:
+            self.box_loop_dizi[15].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
+        elif remaining >= 40:
+            self.box_loop_dizi[15].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
         image_index = 15 - int((remaining / 100.0) * 15)
         image_index = max(1, min(image_index, 15))  # 1 ile 15 arasında sınırla
 
@@ -627,8 +652,17 @@ class MainWindow(QMainWindow):
         label_y = 20 - rotated_pixmap.height() // 2 + 98
         self.ibre_heading.move(label_x, label_y)
 
+        if groundspeed > 25:
+            self.box_loop_dizi[1].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
 
+        elif groundspeed < 25:
+            self.box_loop_dizi[1].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
 
+        if airspeed > 25:
+            self.box_loop_dizi[2].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
+
+        elif airspeed < 25:
+            self.box_loop_dizi[2].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
 
     def mete_updated(self, modes):
         try:
