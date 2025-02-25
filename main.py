@@ -90,17 +90,44 @@ class MainWindow(QMainWindow):
         self.ust_goruntu = ImageLabel(parent=tab, height=58,width=300,x_pos=430,y_pos=85,image_path="images/ust.png")
         self.on_goruntu = ImageLabel(parent=tab, height=70,width=130,x_pos=1680,y_pos=109,image_path="images/on.png")
 
+
+        self.gaz_label = LabelClass("GAZ",tab,  "white" ,"transparent", "bold", "12" )
+        self.gaz_label.move(1300, 300)
+
+        self.devir_label = LabelClass("DEVİR",tab, "white" ,"transparent", "bold", "12" )
+        self.devir_label.move(158, 220)
+
+        self.heading_label = LabelClass("HEADING",tab, "white" ,"transparent", "bold", "12" )
+        self.heading_label.move(453, 220)
+
+        self.airspeed_label = LabelClass("AIRSPEED",tab, "white" ,"transparent", "bold", "12" )
+        self.airspeed_label.move(763, 220)
+
+        self.gpsspeed_label = LabelClass("GPSSPEED",tab, "white" ,"transparent", "bold", "12" )
+        self.gpsspeed_label.move(1118, 220)
+
+        self.dikilme_label = LabelClass("DIKILME",tab, "white" ,"transparent", "bold", "12" )
+        self.dikilme_label.move(1433, 220)
+
+        self.horizon_label = LabelClass("HORIZON",tab, "white" ,"transparent", "bold", "12" )
+        self.horizon_label.move(1727, 220)
+
+
         self.sicaklik_frame = FrameClass(parent=tab, width=100, height=25,x_pos=1815,y_pos=950)
         self.dis_sicaklik_frame = FrameClass(parent=tab, width=100, height=25,x_pos=1815,y_pos=970)
         self.sistem_zamani = FrameClass(parent=tab, width=125, height=25,x_pos=1810,y_pos=10)
         self.batarya_kalan = FrameClass(parent=tab, width=50, height=25,x_pos=952,y_pos=465)
-        self.yukselik_etiketi_sea = FrameClass(parent=tab, width=50, height=20,x_pos=438,y_pos=812)
         self.yukselik_etiketi = FrameClass(parent=tab, width=40, height=20,x_pos=640,y_pos=772)
         self.heading_frame = FrameClass(parent=tab, width=50, height=20,x_pos=550,y_pos=20)
         self.airspeed_frame = FrameClass(parent=tab, width=50, height=20,x_pos=854,y_pos=20)
         self.amper_frame = FrameClass(parent=tab, width=50, height=20,x_pos=1142,y_pos=550)
         self.gpsspeed_frame = FrameClass(parent=tab, width=50, height=20,x_pos=1210,y_pos=20)
         self.voltaj_frame = FrameClass(parent=tab, width=50, height=20,x_pos=741,y_pos=550)
+
+
+
+
+
 
         self.label_sicaklik = LabelClass("SICAKLIK", self.sicaklik_frame, "white" ,"transparent", "bold", "12")
         label_sicaklik_yazi = LabelClass("FCC Sıcaklık", tab, "white","transparent", "bold", "12")
@@ -123,7 +150,7 @@ class MainWindow(QMainWindow):
 
         for i in range(16):
             label=LabelClass(self.sayisalveriler_label[i], tab, "white","transparent", "bold", "12",  width=100, height=30)
-            label.move(1590, 300 + i * 30)
+            label.move(1590, 293 + i * 30)
             self.sayisalveriler_labels.append(label)
 
 
@@ -175,38 +202,6 @@ class MainWindow(QMainWindow):
 
 
 
-
-
-        label_gaz_yazi = QLabel("GAZ", tab)
-        label_gaz_yazi.setStyleSheet("color: white; font-weight: bold;")
-        label_gaz_yazi.move(1300, 300)
-
-        label_devir_yazi = QLabel("DEVİR", tab)
-        label_devir_yazi.setStyleSheet("color: white; font-weight: bold;")
-        label_devir_yazi.move(158, 220)
-
-        label_heading_yazi = QLabel("HEADING", tab)
-        label_heading_yazi.setStyleSheet("color: white; font-weight: bold;")
-        label_heading_yazi.move(453, 220)
-
-        label_airspeed_yazi = QLabel("AIRSPEED", tab)
-        label_airspeed_yazi.setStyleSheet("color: white; font-weight: bold;")
-        label_airspeed_yazi.move(763, 220)
-
-        label_gpspeed_yazi = QLabel("GPSSPEED", tab)
-        label_gpspeed_yazi.setStyleSheet("color: white; font-weight: bold;")
-        label_gpspeed_yazi.move(1118, 220)
-
-        label_dikilme_yazi = QLabel("DİKİLME", tab)
-        label_dikilme_yazi.setStyleSheet("color: white; font-weight: bold;")
-        label_dikilme_yazi.move(1433, 220)
-
-        label_horizon_yazi = QLabel("YATIŞ", tab)
-        label_horizon_yazi.setStyleSheet("color: white; font-weight: bold;")
-        label_horizon_yazi.move(1727, 220)
-
-
-
         self.label_dis_sicaklik = QLabel(f"{35:.2f}°C", self.dis_sicaklik_frame)
         self.label_dis_sicaklik.setStyleSheet("color: white; font-weight: bold; font-size: 14px;")
         self.label_dis_sicaklik.setAlignment(Qt.AlignCenter)
@@ -217,9 +212,6 @@ class MainWindow(QMainWindow):
 
         self.global_altitude = altitude_inducator.ScaleWidget(tab)
         self.global_altitude.setGeometry(570, 240, 50, 600)
-
-        self.relative_altitude = altitude_inducator.ScaleWidget(tab)
-        self.relative_altitude.setGeometry(370, 292, 50, 550)
 
         self.throttle = altitude_inducator.ScaleWidget(tab)
         self.throttle.setGeometry(1300, 300, 50, 400)
@@ -235,10 +227,7 @@ class MainWindow(QMainWindow):
             label = QLabel(str(i), tab)
             label.setStyleSheet("color: white; font-weight: bold; font-size: 10px")
             label.move(550, int(812 - (i * 1.854)))
-        for i in range(0, 301, 25):
-            label = QLabel(str(i), tab)
-            label.setStyleSheet("color: white; font-weight: bold; font-size: 10px")
-            label.move(350, 812 - int((i * 1.68)))
+
 
         for i in range(0, 101, 10):
             label = QLabel(str(i), tab)
@@ -258,10 +247,7 @@ class MainWindow(QMainWindow):
         self.yellow_arrow.set_angle(270)
         self.yellow_arrow.move(605,500)
 
-        self.yellow_arrow_2 = yellow_arrow.YellowArrow(tab)
-        self.yellow_arrow_2.setGeometry(100, 100, 100, 80)  # Adjust position and size as needed
-        self.yellow_arrow_2.set_angle(270)
-        self.yellow_arrow_2.move(375, 780)
+
 
         self.yellow_arrow_throttle = yellow_arrow.YellowArrow(tab)
         self.yellow_arrow_throttle.setGeometry(100, 100, 100, 80)  # Adjust position and size as needed
@@ -269,10 +255,6 @@ class MainWindow(QMainWindow):
         self.yellow_arrow_throttle.move(1302, 630)
 
 
-
-        self.label_yukseklik_etiketi_sea = QLabel("YUKSEKLIK", self.yukselik_etiketi_sea)
-        self.label_yukseklik_etiketi_sea.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-        self.label_yukseklik_etiketi_sea.setAlignment(Qt.AlignCenter)
 
         self.label_sistem_zamani = QLabel("ZAMAN", self.sistem_zamani)
         self.label_sistem_zamani.setStyleSheet("color: white; font-weight: bold; font-size: 14px;")
@@ -333,10 +315,7 @@ class MainWindow(QMainWindow):
         self.label_yerden.setAlignment(Qt.AlignCenter)
         self.label_yerden.move(525, 830)
 
-        self.label_deniz = QLabel("DENİZ YUKSEKLİK", tab)
-        self.label_deniz.setStyleSheet("color: white; font-size: 13px; border: 0px")
-        self.label_deniz.setAlignment(Qt.AlignCenter)
-        self.label_deniz.move(330, 830)
+
 
         self.label_haberlesme = QLabel("HABERLEŞME", tab)
         self.label_haberlesme.setStyleSheet("color: white; font-size: 16px; border: 0px")
@@ -534,17 +513,11 @@ class MainWindow(QMainWindow):
         self.sayisalveriler_labels[3].setText(f"{heading}")
         self.sayisalveriler_labels[10].setText(f"{airspeed}")
         self.sayisalveriler_labels[9].setText(f"{groundspeed}")
-        self.label_yukseklik_etiketi_sea.setText(f"{altitude}")
         self.airspeed_needle.setAirspeed(airspeed)
         self.gpsspeed_needle.setAirspeed(groundspeed)
         self.sayisalveriler_labels[6].setText(f"{altitude}")
 
-        global_yukseklik = int(altitude)
-        self.label_yukseklik_etiketi_sea.setText(f"{global_yukseklik}")
-        yeni_y = 819 - (global_yukseklik * 1.9)
-        yeni_y = max(50, min(yeni_y, 819))
-        self.yukselik_etiketi_sea.move(435, int(yeni_y - 10)+770)
-        self.yellow_arrow_2.move(370, int(yeni_y - 40)+770)
+
 
         pixmap = QPixmap("images/ibre5.png")
         scaled_pixmap = pixmap.scaled(200, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
