@@ -9,8 +9,7 @@ from sensorler import *
 from ibredoksanderece import NeedleDoksanDerece
 from ibreyuzdensifira import NeedleYuzdenSifira
 from ibresifirdanyuze import NeedleSifirdanYuze
-from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
-from PyQt5.QtWebEngineWidgets import QWebEngineSettings
+
 from ImageLabelClass import ImageLabel
 from frameclass import FrameClass
 from labelclass import LabelClass
@@ -32,7 +31,6 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
 
-        self.tabs.addTab(self.create_map_tab("Harita"), "Harita")
         self.tabs.addTab(self.create_sekme_2(), "Sekme 2")
         self.tabs.addTab(self.create_tab("Sekme 3"), "Sekme 3")
 
@@ -70,67 +68,8 @@ class MainWindow(QMainWindow):
         tab.setStyleSheet("background-color: #000000;")
         return tab
 
-    def create_map_tab(self, title):
-        tab = QWidget()
-        tab_layout = QVBoxLayout()
 
-        # Harita için Frame oluştur
-        map_frame = QFrame()
-        map_frame.setStyleSheet("background-color: #2E2E2E; border: 1px solid #444;")  # Frame stilini ayarla
-        map_frame_layout = QVBoxLayout(map_frame)
-        map_frame_layout.setContentsMargins(0, 0, 0, 0)  # Kenar boşluklarını kaldır
 
-        # QWebEngineView (Harita Görüntüleme)
-        self.map_view = QWebEngineView()
-        self.map_view.settings().setAttribute(QWebEngineSettings.JavascriptEnabled, True)
-        self.map_view.settings().setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
-        self.map_view.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
-
-        # JavaScript hatalarını konsolda görmek için
-        self.map_view.page().javaScriptConsoleMessage = (
-            lambda level, message, line, sourceID: print(f"JS Error [{level}]: {message} (Line {line})")
-        )
-
-        # HTML İçeriği (Aynı)
-        html_content = """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Harita</title>
-                <meta charset="utf-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-                <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-                <style>
-                    html, body { height: 100%; margin: 0; padding: 0; }
-                    #map { height: calc(100% - 50px); width: 100vw; }
-                </style>
-            </head>
-            <body>
-                <div id="map"></div>
-                <script>
-                    var map = L.map('map').setView([51.505, -0.09], 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap contributors'
-                    }).addTo(map);
-                </script>
-            </body>
-            </html>
-        """
-
-        self.map_view.setHtml(html_content)
-
-        # Harita görünümünü frame içine ekle
-        map_frame_layout.addWidget(self.map_view)
-
-        # Frame'i ana layout'a ekle
-        tab_layout.addWidget(map_frame)
-
-        # Tab'ı yerleşimle düzenle
-        tab.setLayout(tab_layout)
-        tab.setStyleSheet("background-color: #000000;")  # Arka plan rengi
-
-        return tab
 
     def create_sekme_2(self):
         tab = QWidget()
@@ -166,6 +105,28 @@ class MainWindow(QMainWindow):
         self.label_sicaklik = LabelClass("SICAKLIK", self.sicaklik_frame, "white" ,"transparent", "bold", "12")
         label_sicaklik_yazi = LabelClass("FCC Sıcaklık", tab, "white","transparent", "bold", "12")
         label_sicaklik_yazi.move(1727, 953)
+
+        self.sayisalverilertext_label = ["CUSTOM MOD:", "VOLTAj:", "AMPER:", "HEADING:", "ARM DURUMU:",
+                                         "YERDEN YÜKSEKLİK:", "DENİZ YÜKSEKLİĞİ:", "BATARYA:", "BASE MOD:",
+                                         "GPS SPEED:", "AİR SPEED:", "DEVİR:", "GAZ:", "DİKİLME:",
+                                         "YATIŞ:", "YUVARLANMA:"]
+
+        for i in range(16):
+            sayisal_veriler_label = LabelClass(self.sayisalverilertext_label[i], tab, "white","transparent", "bold", "12" )
+            sayisal_veriler_label.move(1420, 300 + i * 30)
+
+
+
+        self.sayisalveriler_label = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15",
+                                     "16"]
+        self.sayisalveriler_labels = []
+
+        for i in range(16):
+            label=LabelClass(self.sayisalveriler_label[i], tab, "white","transparent", "bold", "12",  width=100, height=30)
+            label.move(1590, 300 + i * 30)
+            self.sayisalveriler_labels.append(label)
+
+
 
         self.imu_labels = ["GPS","INS","MAG","AHRS","EKF","PRE","SICAKLIK"]
         self.imu_frames = []
@@ -412,41 +373,6 @@ class MainWindow(QMainWindow):
         self.amper_needle.setNeedleSize(75, 5)
         self.amper_needle.move(1070, 400)
 
-        self.sayisalverilertext_label = ["CUSTOM MOD:", "VOLTAj:", "AMPER:", "HEADİNG:", "ARM DURUMU:",
-                                         "YERDEN YÜKSEKLİK:", "DENİZ YÜKSEKLİĞİ:", "BATARYA:"]
-
-        for i in range(8):
-            label = QLabel(self.sayisalverilertext_label[i], tab)
-            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-            label.setAlignment(Qt.AlignCenter)
-            label.move(1550, 300 + i * 30)
-
-        self.sayisalveriler_label = ["1", "2", "3", "4", "5", "6", "7", "8"]
-        self.sayisalveriler_labels = []
-        for i in range(8):
-            label = QLabel(self.sayisalveriler_label[i], tab)
-            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-            label.setAlignment(Qt.AlignCenter)
-            label.move(1690, 300 + i * 30)
-            self.sayisalveriler_labels.append(label)
-
-        self.sayisalverilertext2_label = ["BASE MOD:", "GPS SPEED:", "AİR SPEED:", "DEVİR:", "GAZ:", "DİKİLME:",
-                                          "YATIŞ:", "YUVARLANMA:"]
-
-        for i in range(8):
-            label = QLabel(self.sayisalverilertext2_label[i], tab)
-            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-            label.setAlignment(Qt.AlignCenter)
-            label.move(1400, 300 + i * 30)
-
-        self.sayisalveriler2_label = ["1", "2", "3", "4", "5", "6", "7", "8"]
-        self.sayisalveriler2_labels = []
-        for i in range(8):
-            label = QLabel(self.sayisalveriler2_label[i], tab)
-            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-            label.setAlignment(Qt.AlignCenter)
-            label.move(1490, 300 + i * 30)
-            self.sayisalveriler2_labels.append(label)
 
         self.imu_labels = ["GPS", "INS", "MAG", "AHRS", "EKF", "PRE", "SICAKLIK"]
         self.imu_frames = []
@@ -497,7 +423,7 @@ class MainWindow(QMainWindow):
         yeni_y = 630 - (throttle * 3.58)
         yeni_y = max(50, min(yeni_y, 630))
         self.yellow_arrow_throttle.move(1302, int(yeni_y)+12)
-        self.sayisalveriler2_labels[4].setText(f"{throttle}")
+        self.sayisalveriler_labels[12].setText(f"{throttle}")
 
     def update_arm(self, base_mode):
 
@@ -511,7 +437,7 @@ class MainWindow(QMainWindow):
             self.motor_frames[1].setStyleSheet("background-color: #FF0000; border: 2px solid white;")
             self.motor_frames_2[0].setStyleSheet("background-color: #FF0000; border: 2px solid white;")
             self.motor_frames_2[1].setStyleSheet("background-color: #FF0000; border: 2px solid white;")
-        self.sayisalveriler2_labels[0].setText(f"{base_mode}")
+        self.sayisalveriler_labels[8].setText(f"{base_mode}")
     def updated_ins(self, ins_healthy):
 
         if ins_healthy == True:
@@ -606,8 +532,8 @@ class MainWindow(QMainWindow):
         self.label_airspeed.setText(f"{airspeed}")
         self.label_gpsspeed.setText(f"{groundspeed}")
         self.sayisalveriler_labels[3].setText(f"{heading}")
-        self.sayisalveriler2_labels[2].setText(f"{airspeed}")
-        self.sayisalveriler2_labels[1].setText(f"{groundspeed}")
+        self.sayisalveriler_labels[10].setText(f"{airspeed}")
+        self.sayisalveriler_labels[9].setText(f"{groundspeed}")
         self.label_yukseklik_etiketi_sea.setText(f"{altitude}")
         self.airspeed_needle.setAirspeed(airspeed)
         self.gpsspeed_needle.setAirspeed(groundspeed)
@@ -674,9 +600,9 @@ class MainWindow(QMainWindow):
             print(f"Error in heartbeat_guncelleme: {e}")
 
     def updated_attitude(self, roll, pitch, yaw):
-        self.sayisalveriler2_labels[5].setText(f"{int(pitch)}")
-        self.sayisalveriler2_labels[6].setText(f"{int(roll)}")
-        self.sayisalveriler2_labels[7].setText(f"{int(yaw)}")
+        self.sayisalveriler_labels[13].setText(f"{int(pitch)}")
+        self.sayisalveriler_labels[14].setText(f"{int(roll)}")
+        self.sayisalveriler_labels[15].setText(f"{int(yaw)}")
 
         original_pixmap = QPixmap("images/yan.png")
         scaled_pixmap = original_pixmap.scaled(125, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
