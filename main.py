@@ -9,7 +9,8 @@ from sensorler import *
 from ibredoksanderece import NeedleDoksanDerece
 from ibreyuzdensifira import NeedleYuzdenSifira
 from ibresifirdanyuze import NeedleSifirdanYuze
-
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
+from PyQt5.QtWebEngineWidgets import QWebEngineSettings
 from ImageLabelClass import ImageLabel
 from frameclass import FrameClass
 from labelclass import LabelClass
@@ -31,6 +32,7 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
 
+        self.tabs.addTab(self.create_map_tab("Harita"), "Harita")
         self.tabs.addTab(self.create_sekme_2(), "Sekme 2")
         self.tabs.addTab(self.create_tab("Sekme 3"), "Sekme 3")
 
@@ -68,8 +70,67 @@ class MainWindow(QMainWindow):
         tab.setStyleSheet("background-color: #000000;")
         return tab
 
+    def create_map_tab(self, title):
+        tab = QWidget()
+        tab_layout = QVBoxLayout()
 
+        # Harita için Frame oluştur
+        map_frame = QFrame()
+        map_frame.setStyleSheet("background-color: #2E2E2E; border: 1px solid #444;")  # Frame stilini ayarla
+        map_frame_layout = QVBoxLayout(map_frame)
+        map_frame_layout.setContentsMargins(0, 0, 0, 0)  # Kenar boşluklarını kaldır
 
+        # QWebEngineView (Harita Görüntüleme)
+        self.map_view = QWebEngineView()
+        self.map_view.settings().setAttribute(QWebEngineSettings.JavascriptEnabled, True)
+        self.map_view.settings().setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+        self.map_view.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
+
+        # JavaScript hatalarını konsolda görmek için
+        self.map_view.page().javaScriptConsoleMessage = (
+            lambda level, message, line, sourceID: print(f"JS Error [{level}]: {message} (Line {line})")
+        )
+
+        # HTML İçeriği (Aynı)
+        html_content = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Harita</title>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+                <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+                <style>
+                    html, body { height: 100%; margin: 0; padding: 0; }
+                    #map { height: calc(100% - 50px); width: 100vw; }
+                </style>
+            </head>
+            <body>
+                <div id="map"></div>
+                <script>
+                    var map = L.map('map').setView([51.505, -0.09], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(map);
+                </script>
+            </body>
+            </html>
+        """
+
+        self.map_view.setHtml(html_content)
+
+        # Harita görünümünü frame içine ekle
+        map_frame_layout.addWidget(self.map_view)
+
+        # Frame'i ana layout'a ekle
+        tab_layout.addWidget(map_frame)
+
+        # Tab'ı yerleşimle düzenle
+        tab.setLayout(tab_layout)
+        tab.setStyleSheet("background-color: #000000;")  # Arka plan rengi
+
+        return tab
 
     def create_sekme_2(self):
         tab = QWidget()
