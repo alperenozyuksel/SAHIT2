@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBo
     QTextEdit
 from PyQt5.QtGui import QPalette, QColor, QPixmap, QPainter, QTransform
 from PyQt5.QtCore import Qt, QTimer
+from pymavlink.mavextra import airspeed
+
 import altitude_inducator
 import yellow_arrow
 from sensorler import *
@@ -206,9 +208,9 @@ class MainWindow(QMainWindow):
         self.label_dis_sicaklik.setStyleSheet("color: white; font-weight: bold; font-size: 14px;")
         self.label_dis_sicaklik.setAlignment(Qt.AlignCenter)
 
-        label_dis_sicaklik_yazi = QLabel("Dış Sıcaklık", tab)
-        label_dis_sicaklik_yazi.setStyleSheet("color: white; font-weight: bold;")
-        label_dis_sicaklik_yazi.move(1730, 974)
+        self.label_dis_sicaklik_yazi = QLabel("Dış Sıcaklık", tab)
+        self.label_dis_sicaklik_yazi.setStyleSheet("color: white; font-weight: bold;")
+        self.label_dis_sicaklik_yazi.move(1730, 974)
 
         self.global_altitude = altitude_inducator.ScaleWidget(tab)
         self.global_altitude.setGeometry(570, 240, 50, 600)
@@ -236,8 +238,7 @@ class MainWindow(QMainWindow):
 
 
 
-        self.label_yukseklik_etiketi = QLabel("YUKSEKLIK", tab)
-        self.label_yukseklik_etiketi.setStyleSheet("color: white; font-weight: bold; font-size: 11px;")
+        self.label_yukseklik_etiketi = LabelClass("YUKSEKLIK", tab , "white", "transparent", "bold", "12")
         self.label_yukseklik_etiketi.setAlignment(Qt.AlignCenter)
         self.label_yukseklik_etiketi.move(640,772)
 
@@ -256,41 +257,34 @@ class MainWindow(QMainWindow):
 
 
 
-        self.label_sistem_zamani = QLabel("ZAMAN", self.sistem_zamani)
-        self.label_sistem_zamani.setStyleSheet("color: white; font-weight: bold; font-size: 14px;")
-        self.label_sistem_zamani.setAlignment(Qt.AlignCenter)
+        self.sistem_zamanı_label = LabelClass("ZAMAN", self.sistem_zamani, "white", "transparent", "bold", "12")
+        self.sistem_zamanı_label.setAlignment(Qt.AlignCenter)
 
 
-        self.label_heading = QLabel("HEADING", self.heading_frame)
-        self.label_heading.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
+        self.label_heading = LabelClass("HEADING", self.heading_frame, "white", "transparent", "bold", "12")
         self.label_heading.setAlignment(Qt.AlignCenter)
 
 
 
-        self.label_airspeed = QLabel("AIRSPEED", self.airspeed_frame)
-        self.label_airspeed.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
+        self.label_airspeed = LabelClass("AIRSPEED", self.airspeed_frame, "white", "transparent", "bold", "12")
         self.label_airspeed.setAlignment(Qt.AlignCenter)
 
 
 
-        self.label_gpsspeed = QLabel("GPSPEED", self.gpsspeed_frame)
-        self.label_gpsspeed.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
+        self.label_gpsspeed = LabelClass("GPSSPEED", self.gpsspeed_frame, "white", "transparent", "bold", "12")
         self.label_gpsspeed.setAlignment(Qt.AlignCenter)
 
-        self.label_voltaj_text = QLabel("VOLTAJ", tab)
-        self.label_voltaj_text.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-        self.label_voltaj_text.setAlignment(Qt.AlignCenter)
-        self.label_voltaj_text.move(743,530)
+        self.voltaj_text_label = LabelClass("VOLTAJ", tab, "white", "transparent", "bold", "12")
+        self.voltaj_text_label.setAlignment(Qt.AlignCenter)
+        self.voltaj_text_label.move(743,530)
 
-        self.label_amper_text = QLabel("AMPER", tab)
-        self.label_amper_text.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-        self.label_amper_text.setAlignment(Qt.AlignRight)
-        self.label_amper_text.move(1145, 530)
+        self.amper_text_label = LabelClass("AMPER", tab, "white", "transparent", "bold", "12")
+        self.amper_text_label.setAlignment(Qt.AlignRight)
+        self.amper_text_label.move(1145, 530)
 
-        self.label_batarya_text = QLabel("BATARYA", tab)
-        self.label_batarya_text.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-        self.label_batarya_text.setAlignment(Qt.AlignCenter)
-        self.label_batarya_text.move(950, 500)
+        self.batarya_text_label = LabelClass("BATARYA", tab, "white", "transparent", "bold", "12")
+        self.batarya_text_label.setAlignment(Qt.AlignCenter)
+        self.batarya_text_label.move(950, 500)
 
         self.status_text_box = QTextEdit(tab)
         self.status_text_box.setReadOnly(True)
@@ -298,36 +292,31 @@ class MainWindow(QMainWindow):
         self.status_text_box.setGeometry(1340, 845, 300, 150)  # (x, y, width, height)
 
 
-
-        self.label_voltaj = QLabel("VOLTAJ", self.voltaj_frame)
+        self.label_voltaj = LabelClass("VOLTAJ", self.voltaj_frame, "white", "transparent", "bold", "12")
         self.label_voltaj.setAlignment(Qt.AlignCenter)
-        self.label_voltaj.setStyleSheet("color: white; font-size: 12px;")
 
 
 
-        self.label_amper = QLabel("AMPER", tab)
-        self.label_amper.setStyleSheet("color: white; font-size: 11px; border: 0px")
+        self.label_amper = LabelClass("AMPER", tab, "white", "transparent", "bold", "12")
         self.label_amper.setAlignment(Qt.AlignCenter)
         self.label_amper.move(1154, 554)
 
-        self.label_yerden = QLabel("YERDEN YUKSEKLİK", tab)
-        self.label_yerden.setStyleSheet("color: white; font-size: 13px; border: 0px")
+        self.label_yerden = LabelClass("YERDEN", tab, "white", "transparent", "bold", "13")
         self.label_yerden.setAlignment(Qt.AlignCenter)
         self.label_yerden.move(525, 830)
 
 
 
-        self.label_haberlesme = QLabel("HABERLEŞME", tab)
-        self.label_haberlesme.setStyleSheet("color: white; font-size: 16px; border: 0px")
-        self.label_haberlesme.setAlignment(Qt.AlignCenter)
-        self.label_haberlesme.move(1340, 820)
+        self.haberlesme_label = LabelClass("HABERLEŞME", tab, "white", "transparent", "bold", "16")
+        self.haberlesme_label.setAlignment(Qt.AlignCenter)
+        self.haberlesme_label.move(1340, 820)
+
 
         self.mode_frame = QLabel(tab)
         self.mode_frame.setGeometry(935, 345, 150, 25)
         self.mode_frame.setStyleSheet("background: transparent;")
 
-        self.label_mode = QLabel("HEARTBEAT:", self.mode_frame)
-        self.label_mode.setStyleSheet("color: white; font-weight: bold;")
+        self.label_mode = LabelClass("HEARTBEAT", self.mode_frame, "white", "transparent", "bold", "12")
         self.label_mode.setAlignment(Qt.AlignCenter)
 
         tab.setStyleSheet("background-color: #000000;")
@@ -352,24 +341,28 @@ class MainWindow(QMainWindow):
         self.amper_needle.setNeedleSize(75, 5)
         self.amper_needle.move(1070, 400)
 
+        self.box_loop_dizi = []
 
-        self.imu_labels = ["GPS", "INS", "MAG", "AHRS", "EKF", "PRE", "SICAKLIK"]
-        self.imu_frames = []
-        for i in range(7):
-
-            box = FrameClass(parent=tab, width=100, height=25,x_pos=1200, y_pos=790 + i * 30)
-
-            label = QLabel(self.imu_labels[i], box)
-            label.setStyleSheet("color: white; font-weight: bold; font-size: 12px;")
-            label.setAlignment(Qt.AlignCenter)
-            self.imu_frames.append(box)
+        for i in range(16):
+            box_loop = QFrame(tab)
+            box_loop.setFrameShape(QFrame.Box)
+            box_loop.setStyleSheet("background-color: #000000; border: 1px solid white;")
+            box_loop.setFixedSize(12, 12)
+            box_loop.move(1385, 305 + i * 29.5)
+            self.box_loop_dizi.append(box_loop)
 
 
 
 
+       
+
+       
+       
+       
 
 
         return tab
+
 
     def update_progress_bars(self, data):
         for i, bar in enumerate(self.motor_bars):
@@ -395,6 +388,11 @@ class MainWindow(QMainWindow):
         self.yukselik_etiketi.move(638, int(yeni_y-10))
         self.yellow_arrow.move(572, int(yeni_y - 40))
         self.sayisalveriler_labels[5].setText(f"{relative_alt}")
+
+        if relative_alt <5:
+            self.box_loop_dizi[13].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
+        elif relative_alt >=5:
+            self.box_loop_dizi[13].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
 
 
     def update_throttle(self, chan3_raw):
@@ -469,6 +467,7 @@ class MainWindow(QMainWindow):
         scrollbar = self.status_text_box.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
+
     def updated_gps_count(self, satellite_count):
         if satellite_count > 9:
             self.imu_frames[0].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
@@ -495,6 +494,25 @@ class MainWindow(QMainWindow):
         self.resim_yolu = f"batarya/{image_index}.png"
 
         self.update_battery_image()
+
+        if voltage <= 19.5:
+            self.box_loop_dizi[9].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
+        elif 19.5 < voltage <= 20:
+            self.box_loop_dizi[9].setStyleSheet("background-color: #FFFF00; border: 1px solid white;")
+        elif voltage > 20:
+            self.box_loop_dizi[9].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
+
+        if current < 45:
+            self.box_loop_dizi[10].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
+        elif current >= 45:
+            self.box_loop_dizi[10].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
+
+        if remaining < 30:
+            self.box_loop_dizi[15].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
+        elif remaining >= 40:
+            self.box_loop_dizi[15].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
+
+
 
     def update_battery_image(self):
         new_pixmap = QPixmap(self.resim_yolu)
@@ -539,7 +557,19 @@ class MainWindow(QMainWindow):
         label_y = 20 - rotated_pixmap.height() // 2 + 98
         self.ibre_heading.move(label_x, label_y)
 
+        if groundspeed > 25:
+            self.box_loop_dizi[1].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
 
+        elif groundspeed < 25:
+            self.box_loop_dizi[1].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
+
+
+
+        if airspeed > 25:
+            self.box_loop_dizi[2].setStyleSheet("background-color: #FF0000; border: 1px solid white;")
+            
+        elif airspeed < 25:
+            self.box_loop_dizi[2].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
 
 
     def mete_updated(self, modes):
