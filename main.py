@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QFrame, QProgressBar, \
-    QTextEdit
+    QTextEdit, QPushButton
 from PyQt5.QtGui import QPalette, QColor, QPixmap, QPainter, QTransform
 from PyQt5.QtCore import Qt, QTimer
 from pymavlink.mavextra import airspeed
@@ -12,7 +12,7 @@ from ibredoksanderece import NeedleDoksanDerece
 from ibreyuzdensifira import NeedleYuzdenSifira
 from ibresifirdanyuze import NeedleSifirdanYuze
 
-from ImageLabelClass import ImageLabel
+from ImageLabelClass import *
 from frameclass import FrameClass
 from labelclass import LabelClass
 
@@ -57,6 +57,24 @@ class MainWindow(QMainWindow):
         self.mavlink_thread.attitude_updated.connect(self.updated_attitude)
         self.mavlink_thread.start()
 
+
+
+
+
+
+
+
+
+
+
+                                  
+
+
+
+
+
+
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_all)  # Her zamanlayıcıda yeniden çiz
         self.timer.start(100)  # Her 100ms'de bir
@@ -72,30 +90,45 @@ class MainWindow(QMainWindow):
 
 
 
-
     def create_sekme_2(self):
         tab = QWidget()
+        self.o = "images/on.png"
+        self.y = "images/yan.png"
+        self.u = "images/ust.png"
 
+        self.o_h = 70
+        self.y_h = 40
+        self.u_h = 58
+
+        self.o_w = 130
+        self.y_w = 300
+        self.u_w = 300
         self.resim_yolu = "batarya/1.png"
+        self.ibre_batarya_100 = ImageLabel(parent=tab, height=180, width=200, x_pos=885, y_pos=340, image_path=self.resim_yolu)
         self.drone_label = ImageLabel(parent=tab, width=1000, height=600, x_pos=680, y_pos=180, image_path="images/drone600_600.png")
-        self.logo = ImageLabel(parent=tab, width=300, height=800,x_pos=500, y_pos=800, image_path="images/SONYAKAMOZ1.png")
-        self.ibre_batarya_100 = ImageLabel(parent=tab,height=180,width=200,x_pos=885,y_pos=340,image_path=self.resim_yolu)
-        self.ibre_devir = ImageLabel(parent=tab, height=200,width=300,x_pos=80,y_pos=20,image_path="images/ibre2.png")
-        self.ibre_heading = ImageLabel(parent=tab, height=200,width=300,x_pos=379,y_pos=20,image_path="images/ibre5.png")
-        self.ibre_air_speed = ImageLabel(parent=tab, height=200,width=300,x_pos=700,y_pos=20,image_path="images/ibre7.png")
-        self.ibre_gps_speed = ImageLabel(parent=tab, height=200,width=300,x_pos=1055,y_pos=20,image_path="images/ibre7.png")
-        self.ibre_dikilme = ImageLabel(parent=tab, height=200,width=300,x_pos=1365,y_pos=20,image_path="images/ibre3.png")
-        self.ibre_yatis = ImageLabel(parent=tab, height=200,width=300,x_pos=1645,y_pos=20,image_path="images/ibre4.png")
-        self.ibre_voltaj = ImageLabel(parent=tab, height=175,width=300,x_pos=680,y_pos=400,image_path="images/deneme.png")
-        self.ibre_amper = ImageLabel(parent=tab, height=175,width=300,x_pos=1082,y_pos=400,image_path="images/ibre10.png")
-        self.yan_goruntu = ImageLabel(parent=tab, height=40,width=300,x_pos=1400,y_pos=96,image_path="images/yan.png")
-        self.ust_goruntu = ImageLabel(parent=tab, height=58,width=300,x_pos=430,y_pos=85,image_path="images/ust.png")
-        self.on_goruntu = ImageLabel(parent=tab, height=70,width=130,x_pos=1680,y_pos=109,image_path="images/on.png")
+        self.logo = ImageLabel(parent=tab, width=300, height=800, x_pos=500, y_pos=800, image_path="images/SONYAKAMOZ1.png")
+        self.ibre_devir = ImageLabel(parent=tab, height=200, width=300, x_pos=80, y_pos=20, image_path="images/ibre2.png")
+        self.ibre_heading = ImageLabel(parent=tab, height=200, width=300, x_pos=379, y_pos=20, image_path="images/ibre5.png")
+        self.ibre_air_speed = ImageLabel(parent=tab, height=200, width=300, x_pos=700, y_pos=20, image_path="images/ibre7.png")
+        self.ibre_gps_speed = ImageLabel(parent=tab, height=200, width=300, x_pos=1055, y_pos=20, image_path="images/ibre7.png")
+        self.ibre_dikilme = ImageLabel(parent=tab, height=200, width=300, x_pos=1365, y_pos=20, image_path="images/ibre3.png")
+        self.ibre_yatis = ImageLabel(parent=tab, height=200, width=300, x_pos=1645, y_pos=20, image_path="images/ibre4.png")
+        self.ibre_voltaj = ImageLabel(parent=tab, height=175, width=300, x_pos=680, y_pos=400, image_path="images/deneme.png")
+        self.ibre_amper = ImageLabel(parent=tab, height=175, width=300, x_pos=1082, y_pos=400, image_path="images/ibre10.png")
+        self.on = ImageLabel( parent= tab, height=self.o_h, width=self.o_w, x_pos=1680, y_pos=109, image_path=self.o)
+        self.yan = ImageLabel( parent= tab, height=self.y_h, width=self.y_w, x_pos=1400, y_pos=96, image_path=self.y)
+        self.ust = ImageLabel( parent= tab, height=self.u_h, width=self.u_w, x_pos=430, y_pos=85, image_path=self.u)
+
+
+
+
+
+
 
 
         self.gaz_label = LabelClass("GAZ",tab,  "white" ,"transparent", "bold", "12" )
         self.gaz_label.move(1300, 300)
-
+        
         self.devir_label = LabelClass("DEVİR",tab, "white" ,"transparent", "bold", "12" )
         self.devir_label.move(158, 220)
 
@@ -201,7 +234,12 @@ class MainWindow(QMainWindow):
 
 
 
-
+        self.button= QPushButton('AIRCRAFT TYPE',self)
+        self.button.setGeometry(100,80,120,40)
+        self.button.setStyleSheet("QPushButton { background-color: #222222; }")
+        self.button.move(1700, 900)
+        self.button.clicked.connect(self.on_button_click)
+        self.aircraft_type = 1
 
 
         self.label_dis_sicaklik = QLabel(f"{35:.2f}°C", self.dis_sicaklik_frame)
@@ -343,12 +381,31 @@ class MainWindow(QMainWindow):
 
         self.box_loop_dizi = []
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         for i in range(16):
             box_loop = QFrame(tab)
             box_loop.setFrameShape(QFrame.Box)
             box_loop.setStyleSheet("background-color: #000000; border: 1px solid white;")
             box_loop.setFixedSize(12, 12)
-            box_loop.move(1385, 305 + i * 29.5)
+            box_loop.move(1385, 302 + i * 30)
             self.box_loop_dizi.append(box_loop)
 
 
@@ -360,13 +417,30 @@ class MainWindow(QMainWindow):
        
        
 
-
+        self.update
         return tab
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     def update_progress_bars(self, data):
         for i, bar in enumerate(self.motor_bars):
             bar.setValue(data[f"servo{i+1}"])
+
+
 
 
 
@@ -634,12 +708,63 @@ class MainWindow(QMainWindow):
 
         # Yeni döndürülmüş pixmap oluştur (Ölçek korunuyor)
         rotated_pixmap_2 = scaled_pixmap_2.transformed(transform_2, Qt.SmoothTransformation)
-        self.on_goruntu.move(1700, 70)
+        self.on_goruntu.move(1685, 110)
         self.on_goruntu.setStyleSheet("background-color: transparent;")
         self.on_goruntu.setPixmap(rotated_pixmap_2)
 
     def update_all(self):
         self.update()
+
+
+
+
+
+    def on_button_click(self):
+        if self.aircraft_type == 1:
+            self.o = "images/drone_on.png"
+            self.y = "images/drone_yan.png"
+            self.u = "images/drone_ust.png"
+            self.o_h = 810
+            self.y_h = 150
+            self.u_h = 78
+            self.o_w = 150
+            self.y_w = 600
+            self.u_w = 320
+            self.aircraft_type = 2
+            print(self.aircraft_type)
+        else:
+            self.o = "images/on.png"
+            self.y = "images/yan.png"
+            self.u = "images/ust.png"
+            self.o_h = 630
+            self.y_h = 40
+            self.u_h = 58
+            self.o_w = 130
+            self.y_w = 300
+            self.u_w = 300
+            self.aircraft_type = 1
+            print(self.aircraft_type)
+        self.update_images()
+
+
+    def update_images(self):
+        # on_goruntu resmini güncelle
+        # on_goruntu resmini güncelle
+        new_pixmap_o = QPixmap(self.o)
+        scaled_pixmap_o = new_pixmap_o.scaled(self.o_w, self.o_h, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.on.setPixmap(scaled_pixmap_o)
+
+        # yan_goruntu resmini güncelle
+        new_pixmap_y = QPixmap(self.y)
+        scaled_pixmap_y = new_pixmap_y.scaled(self.y_w, self.y_h, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.yan.setPixmap(scaled_pixmap_y)
+
+        # ust_goruntu resmini güncelle
+        new_pixmap_u = QPixmap(self.u)
+        scaled_pixmap_u = new_pixmap_u.scaled(self.u_w, self.u_h, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.ust.setPixmap(scaled_pixmap_u)
+
+
 
 
 if __name__ == "__main__":

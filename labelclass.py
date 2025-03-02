@@ -15,3 +15,6 @@ class LabelClass(QLabel):
 
         if width and height:
             self.setFixedSize(width, height)
+
+
+

@@ -21,3 +21,7 @@ class ImageLabel(QLabel):
         self.setStyleSheet("background-color: transparent;")
 
         self.move(x_pos, y_pos)
+
+
+
+
