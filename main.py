@@ -1,8 +1,8 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QFrame, QProgressBar, \
     QTextEdit, QPushButton
-from PyQt5.QtGui import QPalette, QColor, QPixmap, QPainter, QTransform
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QPalette, QColor, QPixmap, QPainter, QTransform, QColor, QPen , QFont
+from PyQt5.QtCore import Qt, QTimer , QRectF, QPointF
 from pymavlink.mavextra import airspeed
 
 import altitude_inducator
@@ -11,17 +11,22 @@ from sensorler import *
 from ibredoksanderece import NeedleDoksanDerece
 from ibreyuzdensifira import NeedleYuzdenSifira
 from ibresifirdanyuze import NeedleSifirdanYuze
-
+from numeric_dial import NumericDial
 from ImageLabelClass import *
 from frameclass import FrameClass
 from labelclass import LabelClass
-
+from kadranSayilariClass import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.setWindowTitle("Ana Pencere")
+        self.setGeometry(100, 100, 500, 500)
 
+        # NumericDial nesnesini oluştur ve pencereye ekle
+        self.dial_widget = NumericDial(self)
+        self.setCentralWidget(self.dial_widget)
 
         self.setWindowTitle("ŞAHİT")
         self.setGeometry(100, 100, 1920, 1080)
@@ -33,8 +38,8 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
 
-        self.tabs.addTab(self.create_sekme_2(), "Sekme 2")
-        self.tabs.addTab(self.create_tab("Sekme 3"), "Sekme 3")
+        self.tabs.addTab(self.create_sekme_2(), "Kontrol Paneli")
+        self.tabs.addTab(self.create_tab("Kamera"), "Kamera")
 
 
 
@@ -92,6 +97,8 @@ class MainWindow(QMainWindow):
 
     def create_sekme_2(self):
         tab = QWidget()
+
+
         self.o = "images/on.png"
         self.y = "images/yan.png"
         self.u = "images/ust.png"
@@ -418,6 +425,15 @@ class MainWindow(QMainWindow):
        
 
         self.update
+
+        self.airspeed_dial = NumberDial(tab, width=200, height=200, x_pos=700, y_pos=20, start_angle=135, end_angle=405,
+                                        num_steps=10)
+        self.gpsspeed_dial = NumberDial(tab, width=200, height=200, x_pos=1055, y_pos=20, start_angle=135,
+                                        end_angle=405, num_steps=10)
+        self.airspeed_dial.raise_()  # Sayıları ön plana getir
+
+
+
         return tab
 
 
@@ -646,6 +662,12 @@ class MainWindow(QMainWindow):
             self.box_loop_dizi[2].setStyleSheet("background-color: #00FF00; border: 1px solid white;")
 
 
+    def updated_vfr(self, heading, airspeed, groundspeed, altitude, climb, throttle):
+        self.airspeed_dial.set_value(airspeed)
+        self.gpsspeed_dial.set_value(groundspeed)
+
+
+
     def mete_updated(self, modes):
         try:
 
@@ -763,7 +785,6 @@ class MainWindow(QMainWindow):
         new_pixmap_u = QPixmap(self.u)
         scaled_pixmap_u = new_pixmap_u.scaled(self.u_w, self.u_h, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.ust.setPixmap(scaled_pixmap_u)
-
 
 
 
